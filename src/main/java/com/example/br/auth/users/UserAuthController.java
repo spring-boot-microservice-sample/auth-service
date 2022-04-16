@@ -33,23 +33,26 @@ public class UserAuthController {
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody LoginRequest loginRequest) {
 
-        Optional<User> user = userRepository.findByEmail(loginRequest.getEmail());
+        Optional<User> userByEmail = userRepository.findByEmail(loginRequest.getEmail());
 
-        if(user.isEmpty()) {
+        if(userByEmail.isEmpty()) {
             return ResponseHandler.response("Entered User Email does not exists", HttpStatus.BAD_REQUEST );
         }
 
-        boolean isPasswordCorrect = passwordEncoder.matches(loginRequest.getPassword(), user.get().getPassword());
+        User user = userByEmail.get();
+        boolean isPasswordCorrect = passwordEncoder.matches(loginRequest.getPassword(), user.getPassword());
 
         if (!isPasswordCorrect) {
             return ResponseHandler.response("Password is incorrect", HttpStatus.BAD_REQUEST );
         }
 
         try {
-            String token = jwtUtil.generateToken(loginRequest.getEmail());
+            String token = jwtUtil.generateToken(user.getUser_id());
 
             LoginResponse responseData = LoginResponse.builder()
-                    .user(user.get())
+                    .user_id(user.getUser_id())
+                    .email(user.getEmail())
+                    .name(user.getEmail())
                     .token(token)
                     .build();
 

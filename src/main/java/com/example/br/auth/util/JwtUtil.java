@@ -1,5 +1,6 @@
 package com.example.br.auth.util;
 
+import com.example.br.auth.users.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -14,11 +15,10 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String jwtSecretKey;
 
-//    @Value("$jwt.token.validity")
-    private long jwtTokenValidity = 600000;
+    private final long jwtTokenValidity = 30 * 60 * 1000;
 
-    public String generateToken(String id) {
-        Claims claims = Jwts.claims().setSubject(id);
+    public String generateToken(Long user_id) {
+        Claims claims = Jwts.claims().setSubject(user_id.toString());
         long nowMillis = System.currentTimeMillis();
         long expiryMillis = nowMillis + jwtTokenValidity;
         Date expiry = new Date(expiryMillis);
